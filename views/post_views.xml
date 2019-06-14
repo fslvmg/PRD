@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record id="post_action" model="ir.actions.act_window">
+            <field name="name">职位配置</field>
+            <field name="res_model">prd.post</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+        </record>
+    </data>
+</odoo>

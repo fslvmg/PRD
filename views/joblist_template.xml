@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<odoo>
+    <template id="assets_frontend" name="library_website_assets" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/css" href="/company_prd/static/src/css/company_prd.css" />
+        </xpath>
+    </template>
+
+    <template id="job_add" name="Job Add Template">
+        <t t-call="website.layout">
+            <div class="container text-center">
+                <form action='/api/job/add' method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="form-item">
+                        <span class ="item-title">岗位：</span>
+                        <select name="job_name" class ="item-body">
+                            <t t-foreach="posts" t-as="post">
+                                <option t-att-value="post.id">
+                                    <span t-field="post.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <span class ="body_content_left">人数：</span>
+                        <input type="number" name="no_of_recruitment" value="1" min="1" max="10" class ="body_content_right"/>
+                    </div>
+                    <div class="form-item">
+                        <span class ="body_content_left">工作说明：</span>
+                        <textarea name="description" class ="body_content_right"/>
+                    </div>
+                    <div class="clearfix">
+                        <button type="submit">提交</button>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="job_list" name="Job List Template">
+        <div id="wrap" class="container">
+            <t t-foreach="jobs" t-as="job">
+                <div class="row">
+                    <a t-attf-href="/applicant/start/{{slug(job)}}">
+                        <span t-field ="job.application_count"/>
+                        <span t-field ="job.department_id"/>
+                        <span t-field ="job.no_of_recruitment"/>
+                    </a>
+                </div>
+            </t>
+        </div>
+    </template>
+    <template id="job_list2" name="Job List Template">
+        <div id="wrap" class="container">
+            <form action="/api/joblist" method="post">
+                <input type="tel" name="phone" />
+                <div class="clearfix">
+                    <button type="submit" class="btn btn-primary float-right mb32 ">
+                                Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </template>
+    <!-- new layout for applicant -->
+    <template id="company_prd.layout" name="Survey Layout">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_common"/>
+                <t t-call-assets="survey.survey_assets"/>
+            </t>
+            <body>
+                <header>
+                    <div>
+                        <title>Odoo</title>
+                    </div>
+                    <div class="text-center">
+                        <img t-attf-src="/web/binary/company_logo" alt="Logo"/>
+                    </div>
+                </header>
+                <div id="wrap" class="oe_structure oe_empty"/>
+                <main>
+                    <t t-raw="0"/>
+                </main>
+            </body>
+            <xpath expr="//footer" position="replace">
+                <div class="container mt16 mb8">
+                    <div class="float-right" t-ignore="true" t-if="not editable">
+                        Create a <a target="_blank" href="https://www.odoo.com/page/website-builder">free website</a> with
+                        <a target="_blank" class="badge badge-danger" href="https://www.odoo.com/page/website-builder">Odoo</a>
+                    </div>
+                    <div class="float-left text-muted" itemscope="itemscope" itemtype="https://schema.org/Organization">
+                        Copyright &amp;copy; <span t-field="res_company.name" itemprop="name">Company name</span>
+                    </div>
+                </div>
+            </xpath>
+        </t>
+    </template>
+</odoo>

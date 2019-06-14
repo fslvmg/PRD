@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="Main_Menu" name="PRD" />
+        <menuitem id="company_menu" name="企业" parent="Main_Menu" action="company_action" sequence="10"/>
+        <menuitem id="post_menu" name="职位" parent="Main_Menu" action="post_action" sequence="10"/>
+        <menuitem id="job_menu" name="招聘" parent="Main_Menu" action="job_action" sequence="10"/>
+        <menuitem id="application_menu" name="求职" parent="Main_Menu" action="applicant_action" sequence="10"/>
+        <menuitem id="wxapp_config_menu" action="wxapp_config_action" name="对接设置" parent="Main_Menu" sequence="10"/>
+        <menuitem id="wxapp_user_menu" action="wxapp_user_action_405" name="用户" parent="Main_Menu" sequence="10"/>
+    </data>
+</odoo>

@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+            <record id="job_form_view" model="ir.ui.view">
+            <field name="name">创建新招聘</field>
+                <field name="model">hr.job</field>
+                <field name ="inherit_id" ref ="hr.view_hr_job_form" />
+                <field name ="arch" type="xml">
+                    <xpath expr="//group[@name='offer']" position="attributes">
+                        <attribute name="invisible">True</attribute>
+                    </xpath>
+                    <xpath expr="//group[@name='offer']" position="after">
+                        <field name="qrcode_url" string="二维码地址"/>
+                        <field name="post_id" string="岗位"/>
+                    </xpath>
+                </field>
+            </record>
+        <record id="job_action" model="ir.actions.act_window">
+            <field name="name">招聘列表</field>
+            <field name="res_model">hr.job</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+        </record>
+    </data>
+</odoo>

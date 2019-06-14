@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<odoo>
+<template id="assets_frontend"
+        name="library_website_assets"
+        inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/css"
+                href="/company_prd/static/src/css/company_prd.css" />
+        </xpath>
+    </template>
+    <template id="company_prd.layout" name="Survey Layout" >
+    <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_common"/>
+
+            </t>
+            <body>
+                <header>
+                    <div><title>Odoo</title></div>
+                    <div class="text-center">
+                        <img t-attf-src="/web/binary/company_logo" alt="Logo"/>
+                    </div>
+                </header>
+                <div id="wrap" class="oe_structure oe_empty"/>
+                <main>
+                    <t t-raw="0"/>
+                </main>
+            </body>
+            <xpath expr="//footer" position="replace">
+                <div class="container mt16 mb8">
+
+                    <div class="float-left text-muted" itemscope="itemscope" itemtype="https://schema.org/Organization">
+                        Copyright &amp;copy; <span t-field="res_company.name" itemprop="name">Company name</span>
+                    </div>
+                </div>
+            </xpath>
+        </t>
+    </template>
+
+
+    <template id="applicant_init" name="Job List Template">
+    <t t-call="website.layout">
+
+            <form t-att-action ="'/survey/start/%s/%s' % (job.post_id.survey_id.id, survery_token)" method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <lebel t-field="job.address_id" />
+招聘                <br/>
+            岗位：                <lebel t-field="job.name" />
+                <br/>
+            部门：                <lebel t-field="job.department_id" />
+                <br/>
+            表单：                <lebel t-field="job.post_id.survey_id" />
+                <br/>
+            应聘者：                <input type="text" name="applicant_name" />
+                <br/>
+            手机：                <input type="tel" name="phone" />
+                <br/>
+            邮箱：                <input type="email " name="email" />
+                <br/>
+                <div class="clearfix">
+                    <button type="submit" class="btn btn-primary float-right mb32 ">
+                                Confirm
+                    </button>
+                </div>
+            </form>
+            </t>
+    </template>
+</odoo>

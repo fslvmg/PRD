@@ -1,0 +1,51 @@
+<odoo>
+    <data>
+        <record id="company_tree_view" model="ir.ui.view">
+            <field name="name">公司列表</field>
+            <field name="model">res.partner</field>
+            <field name ="arch" type="xml">
+                <tree string ="Company Tree">
+                    <field name="name" string="公司名称" modifiers="{'required':true}"/>
+                    <field name="prd_company_type" string="公司类型"/>
+                    <field name="prd_charge_type" string="计费类型"/>
+                    <field name="prd_leader_id" string="负责人"/>
+                    <field name="phone" string="固话"/>
+                    <field name="mobile" string="手机"/>
+                    <field name="email" string="邮箱"/>
+                </tree>
+            </field>
+        </record>
+        <record id="company_form_view" model="ir.ui.view">
+            <field name="name">公司</field>
+                <field name="model">res.partner</field>
+                <field name ="inherit_id" ref ="base.view_partner_form" />
+                <field name ="arch" type="xml">
+                    <xpath expr="//page[@name='internal_notes']" position="attributes">
+                        <attribute name="invisible">True</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                        <attribute name="invisible">True</attribute>
+                    </xpath>
+                    <notebook position ="inside">
+                        <page string ="PRD">
+                            <group>
+                                <field name="prd_company_type" string="公司类型"/>
+                                <field name="prd_charge_type" string="计费类型"/>
+                                <field name="prd_leader_id" string="负责人" domain="[('parent_id','=', id)]"/>
+                            </group>
+                        </page>
+                    </notebook>
+
+                </field>
+            </record>
+            <record id="company_action" model="ir.actions.act_window">
+                <field name="name">企业列表</field>
+                <field name="res_model">res.partner</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_type">form</field>
+                <field name="domain">[('is_company','=',True),('customer','=',True)]</field>
+                <field name="view_ids" eval ="[(5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('company_tree_view')})]" />
+            </record>
+        </data>
+    </odoo>

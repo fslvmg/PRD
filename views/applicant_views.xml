@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record id="applicant_action" model="ir.actions.act_window">
+            <field name="name">求职列表</field>
+            <field name="res_model">hr.applicant</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+        </record>
+    </data>
+</odoo>
