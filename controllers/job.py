@@ -56,7 +56,7 @@ class PrdJob(http.Controller, BaseController):
 
     @http.route('/<string:sub_domain>/api/job/add',auth='public', methods=['POST'], csrf=False)
     def job_add(self,sub_domain,token=None,**post):
-        _logger.info("===========================================")
+        _logger.info("#####====================================")
         
         res, wechat_user, entry = self._check_user(sub_domain, token)
         if res:return res
@@ -68,8 +68,8 @@ class PrdJob(http.Controller, BaseController):
                 "dateAdd": my_job.create_date,
                 "id": my_job.id
             }
-            
-            defs.create_qrcode(request.httprequest.base_url.split('/'+sub_domain)[0],my_job.id,wechat_user.backend_id.id)
+            _logger.info("#####%s===================%s=================" % (wechat_user.backend_id.id,my_job.id))
+            #defs.create_qrcode(request.httprequest.base_url.split('/'+sub_domain)[0],my_job.id,wechat_user.backend_id.id)
             return self.res_ok(_data)
         except Exception as e:
             _logger.exception(e)
