@@ -57,8 +57,8 @@ class PrdJob(http.Controller, BaseController):
     @http.route('/<string:sub_domain>/api/job/add',auth='public', methods=['POST'], csrf=False)
     def job_add(self,sub_domain,token=None,**post):
         
-        res, wechat_user, entry = self._check_user(sub_domain, token)
-        if res:return res
+        #res, wechat_user, entry = self._check_user(sub_domain, token)
+        #if res:return res
         post = json.loads(post["data"])
         try:
             Job = request.env(user=wechat_user.backend_id.id)['hr.job']      
