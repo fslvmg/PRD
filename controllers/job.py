@@ -69,11 +69,11 @@ class PrdJob(http.Controller, BaseController):
                 "id": my_job.id
             }
             _logger.info("#####%s===================%s=================" % (wechat_user.backend_id.id,my_job.id))
-            #defs.create_qrcode(request.httprequest.base_url.split('/'+sub_domain)[0],my_job.id,wechat_user.backend_id.id)
+            defs.create_qrcode(request.httprequest.base_url.split('/'+sub_domain)[0],my_job.id,wechat_user.backend_id.id)
             return self.res_ok(_data)
         except Exception as e:
             _logger.exception(e)
-            return self.res_err(-1, e.name)
+            return self.res_err(-1, e)
 
     @http.route('/<string:sub_domain>/api/applicant/list', auth='public', methods=['GET'])
     def applicant_list(self, sub_domain, token=None):
