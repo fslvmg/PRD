@@ -25,7 +25,8 @@ class PrdCompany(models.Model):
         my_company = API.ApiPrd()
         sync_data = my_company.post_company(self)
         _logger.info("################%s######################" % sync_data)
-        
+        res = my_company.post_data(sync_data)
+        _logger.info("################同步：%s######################" % res)
         return
 
 

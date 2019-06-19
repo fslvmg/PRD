@@ -26,7 +26,7 @@ class ApiPrd(object):
         path =PRD_URL+"/rest/post"
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
         res = requests.get(path,headers = headers) 
-        obj_position=json.loads(res.content)
+        obj_position=json.loads(res.content.decode('utf-8'))
         return obj_position
     
     def get_survey_by_id(self, post_id):
@@ -35,5 +35,14 @@ class ApiPrd(object):
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
         res = requests.get(path,headers = headers) 
         content_obj=json.loads(res.content)
-        if content_obj:
+        if content_obj
             return content_obj[0]
+    
+    def post_data(self,data):
+        path =PRD_URL+"/rest/companyInfo"
+        headers = {'Content-Type': 'application/json'}
+        r = requests.post(path,data,headers =headers)
+        return r.text
+
+
+        
