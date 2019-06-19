@@ -34,7 +34,7 @@ class ApiPrd(object):
         path =PRD_URL+"/rest/%s" % post_id
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
         res = requests.get(path,headers = headers) 
-        content_obj=json.loads(res.content)
+        content_obj=json.loads(res.content.decode('utf-8'))
         if content_obj:
             return content_obj[0]
     
