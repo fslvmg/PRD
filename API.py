@@ -35,7 +35,7 @@ class ApiPrd(object):
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
         res = requests.get(path,headers = headers) 
         content_obj=json.loads(res.content)
-        if content_obj
+        if content_obj:
             return content_obj[0]
     
     def post_data(self,data):
