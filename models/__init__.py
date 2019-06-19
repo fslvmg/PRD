@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from . import company
+from . import prd_api
 from . import post
 from . import job
 from . import applicant

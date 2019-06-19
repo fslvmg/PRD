@@ -3,7 +3,13 @@ import re
 import qrcode
 import sys,os 
 
+import json
+import requests
+from requests.exceptions import (ConnectTimeout, ReadTimeout,
+                                 ConnectionError as _ConnectionError)
+from six.moves.urllib.parse import urlencode, urlparse
 from .const import Const
+TIMEOUT = 2
 
 class COMPANYTYPE(Const):
     type1 =('1',u'合资')
@@ -98,7 +104,7 @@ def create_qrcode(Web_url,job_id,create_uid):
     qr = qrcode.QRCode(
         version=2,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=10,
+        box_size=4,
         border=2,
     )
     data = Web_url+'/applicant/start/'+str(create_uid)+'/'+str(job_id)+"/phantom"
@@ -108,3 +114,62 @@ def create_qrcode(Web_url,job_id,create_uid):
     # 保存到的地址
     model_url = os.path.dirname(os.path.realpath(__file__))
     img.save(model_url+'/static/images/qrcode-'+str(job_id)+'.png')
+
+class PrdRequest(object):
+
+    def __init__(self, api):
+        self.api = api
+        self.host = 'http://39.108.182.91:8080/PRD/'
+
+    def url_for_get(self, path, parameters):
+        return self._full_url_with_params(path, parameters)
+
+    def get_request(self, path, **kwargs):
+        return self.make_request(self.prepare_request("GET", path, kwargs))
+
+    def post_request(self, path, **kwargs):
+        return self.make_request(self.prepare_request("POST", path, kwargs))
+
+    def _full_url_with_params(self, path, params):
+        base_query = urlparse(path).query
+        other_query = self._query_with_params(params)
+        if base_query and other_query:
+            return '%s&%s' % (path, other_query)
+        elif other_query:
+            return '%s?%s' % (path, other_query)
+        else:
+            return path
+
+    def _query_with_params(self, params):
+        params = urlencode(params) if params else ""
+        return params
+
+    def _post_body(self, params):
+        return urlencode(params)
+
+    def perpare_and_make_request(self, method, path,
+                                 params, include_secret=False):
+        url, method, body, json_body,  headers = self.prepare_request(
+            method, path, params, include_secret)
+        return self.make_request(url, method, body, json_body, headers)
+
+    def prepare_request(self, method, path, params=None):
+        url = body = None
+        headers = {}
+
+        json_body = params.pop('json_body', None)
+        if not params.get('files'):
+            if method == 'POST':
+                body = self._post_body(params)
+                headers = {'Content-type': 'application/x-www-form-urlencoded'}
+                url = path
+            else:
+                url = self._full_url_with_params(path, params)
+        else:
+            url = path
+
+        return url, method, body, json_body, headers
+
+    def make_request(self, url, method="GET"):
+        return requests.request(method, url,timeout=TIMEOUT)
+ 

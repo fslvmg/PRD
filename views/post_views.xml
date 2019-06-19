@@ -1,8 +1,25 @@
 <odoo>
     <data>
+        <record id="position_form_view" model="ir.ui.view">
+            <field name="name">岗位列表</field>
+            <field name="model">company_prd.post</field>
+            <field name ="arch" type="xml">
+                <form string ="Position Form">
+                    <header>
+                        <button name="sync_from_prd" type="object" string="PRD同步" class="oe_highlight" />
+                    </header>
+                    <sheet>
+                        <field name="name" string="岗位名称"/>
+
+                        <field name="survey_id" string="测评问卷ID"/>
+                        <field name="prd_id" string="PRD-ID"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
         <record id="post_action" model="ir.actions.act_window">
             <field name="name">职位配置</field>
-            <field name="res_model">prd.post</field>
+            <field name="res_model">company_prd.post</field>
             <field name="view_mode">tree,form</field>
             <field name="view_type">form</field>
         </record>

@@ -3,3 +3,5 @@
 from . import controllers
 from . import job
 from . import user
+from . import prd_api
+from . import wxapi

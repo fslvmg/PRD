@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_prd_post,prd.post,model_prd_post,,1,1,1,1
+access_prd_post,company_prd.post,model_company_prd_post,,1,1,1,1
 access_wxapp_config_group_wxapp_config,wxapp_config.group_wxapp_config,model_wxapp_config,,1,1,1,1
 access_wxapp_user_group_wxapp_sale,wxapp_user.group_wxapp_sale,model_wxapp_user,,1,1,1,1

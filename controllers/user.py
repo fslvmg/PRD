@@ -102,7 +102,7 @@ class WxappUser(http.Controller, BaseController):
 
 
     @http.route('/<string:sub_domain>/user/wxapp/register/complex', auth='public', methods=['GET', 'POST'], csrf=False)
-    def register(self, sub_domain, code=None, encryptedData=None, iv=None, **kwargs):
+    def register(self, sub_domain, code=None, encryptedData=None, iv=None, acct_id=None,**kwargs):
         '''
         用户注册
         '''
@@ -139,6 +139,7 @@ class WxappUser(http.Controller, BaseController):
                 'avatar_url': user_info['avatarUrl'],
                 'register_ip': request.httprequest.remote_addr,
                 'user_id': user_id,
+                'backend_id':acct_id,
                 'partner_id': user_id and request.env['res.users'].sudo().browse(user_id).partner_id.id or None,
             })
             return self.res_ok()
@@ -148,7 +149,7 @@ class WxappUser(http.Controller, BaseController):
 
         except Exception as e:
             _logger.exception(e)
-            return self.res_err(-1, e.name)
+            return self.res_err(-1, 'fail to Add Data')
 
     def get_user_info(self, wechat_user):
         data = {
