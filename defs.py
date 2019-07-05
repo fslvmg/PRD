@@ -9,6 +9,7 @@ from requests.exceptions import (ConnectTimeout, ReadTimeout,
                                  ConnectionError as _ConnectionError)
 from six.moves.urllib.parse import urlencode, urlparse
 from .const import Const
+from PIL import Image
 TIMEOUT = 2
 
 class COMPANYTYPE(Const):
@@ -114,6 +115,31 @@ def create_qrcode(Web_url,job_id,create_uid):
     # 保存到的地址
     model_url = os.path.dirname(os.path.realpath(__file__))
     img.save(model_url+'/static/images/qrcode-'+str(job_id)+'.png')
+
+def getWXACodeUnlimit(access_token,Web_url,job_id):
+    if not access_token:
+        pass
+    else:
+        url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={}'.format(access_token)
+        data = {"scene":job_id,
+                "path":"pages/applicant/apply_info",
+                "width":128,
+                # "auto_color":True,
+                # "line_color":{"r":230,"g":40,"b":22},  # 自定义颜色
+                "line_color": {"r": 0, "g": 0, "b": 0},  # 自定义颜色
+                "is_hyaline":True}
+        # todo 不能使用data 要使用json
+        # ret = requests.post(url, json=data)
+        ret = requests.post(url,json=data)
+ 
+        # print(ret.text)
+        model_url = os.path.dirname(os.path.realpath(__file__))
+        print('##################%s############################' % ret.content)
+        with open(model_url+'/static/images/Job/code-'+str(job_id)+'.png','wb') as f:
+            f.write(ret.content)
+        print('-----------------------------------------')
+        #img.save(model_url+'/static/images/Job/code-'+str(job_id)+'.png')
+        print('++++++++++++++++++++++++++++++++++++++++++++')
 
 class PrdRequest(object):
 

@@ -10,7 +10,6 @@ class Job(models.Model):
 
     name = fields.Char('职位名称',default ="New")
     post_id= fields.Many2one('company_prd.post','工作岗位')
-    qrcode_url = fields.Char('二维码地址')
-
+    company_prd_id = fields.Many2one('company_prd.company', string='公司')
 
 

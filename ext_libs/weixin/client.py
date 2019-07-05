@@ -167,6 +167,7 @@ class WXAPPAPI(oauth2.OAuth2API):
     api_name = "Weixin"
     x_ratelimit_remaining = None
     x_ratelimit = None
+    client_credential_token_url = 'https://api.weixin.qq.com/cgi-bin/token'
 
     def __init__(self, *args, **kwargs):
         format = kwargs.get('format', '')

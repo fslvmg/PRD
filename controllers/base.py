@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import json
 from datetime import date, datetime, time
 
@@ -36,6 +35,7 @@ error_code = {
     402: u'该域名已禁用',
     404: u'暂无数据',
     10000: u'微信用户未注册',
+    11000: u'微信用已注册',
     
 }
 

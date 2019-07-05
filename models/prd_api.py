@@ -6,13 +6,23 @@ from .. import API
 _logger = logging.getLogger(__name__)
 
 class PrdCompany(models.Model):
-    _inherit = 'res.partner'
+    _name = 'company_prd.company'
+    _inherits = {'res.partner': 'partner_id'}
 
+    name = fields.Char(related='partner_id.name',string='名称', inherited=True)
+    is_active = fields.Boolean(string='是否启用',default=False)
+
+    partner_id = fields.Many2one('res.partner', required=True, ondelete='cascade', string='企业ID', auto_join=True) 
     prd_code = fields.Char('Prd-Code', default=lambda self: str(uuid.uuid4()), readonly=True, required=True, copy=False)
     prd_company_type = fields.Selection(defs.COMPANYTYPE.attrs.items(), string='公司类型')
     prd_charge_type = fields.Selection(defs.CHARGETYPE.attrs.items(), string='计费类型')
     prd_charge_count = fields.Integer('计数')
     prd_leader_id= fields.Many2one('res.partner', string='负责人') 
+
+    license_ids = fields.One2many(
+        'company_prd.images', # related model
+        'company_id', # fields for "this" on related model
+        string='营业执照')
 
     @api.onchange('prd_leader_id')
     def _onchange_prd_leader_id(self):
@@ -40,7 +50,7 @@ class PrdEmployee(models.Model):
 class PrdSurvey(models.Model):
     _inherit = 'survey.survey'
 
-    prd_id = fields.Integer("测评系统ID", required=True)
+    prd_id = fields.Integer("测评系统ID")
 
     def sync_from_prd(self, post_id):
         my_survey = API.ApiPrd()
@@ -61,7 +71,7 @@ class PrdSurvey(models.Model):
         obj_post = self.env['company_prd.post'].search( [('prd_id', '=', int(post_id))])
         if obj_post.exists():
                 obj_post.write({
-                    'survey_id': survey.id,
+                    'survey_id': survey.id
                 })
 
         obj_page = self.env['survey.page']
@@ -116,12 +126,12 @@ class PrdSurvey(models.Model):
 class PrdPage(models.Model):
     _inherit = 'survey.page'
 
-    prd_id = fields.Integer("测评系统ID", required=True)
+    prd_id = fields.Integer("测评系统ID")
 
 class PrdQuestion(models.Model):
     _inherit = 'survey.question'
 
-    prd_id = fields.Integer("测评系统ID", required=True)
+    prd_id = fields.Integer("测评系统ID")
     prd_idx = fields.Integer("测评系统idx")
 
 class PrdLabel(models.Model):
@@ -129,3 +139,11 @@ class PrdLabel(models.Model):
 
     prd_uuid = fields.Char("测评系统UUID")
     prd_sort = fields.Integer("排序")
+
+class CompanyImage(models.Model):
+    _name = 'company_prd.images'
+    _description = 'company_prd.images'
+
+    name = fields.Char('图片名称')
+    image = fields.Char('Url', attachment=True)
+    company_id = fields.Many2one('company_prd.company', '企业ID', copy=True)

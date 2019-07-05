@@ -11,10 +11,11 @@ class WxappUser(models.Model):
     _description = u'小程序用户'
     _inherits = {'res.partner': 'partner_id'}
 
-    name = fields.Char(related='partner_id.name',string='昵称', inherited=True)
+    name = fields.Char(related='partner_id.name',string='名称', inherited=True)
+    nickname = fields.Char('微信昵称')
 
-    open_id = fields.Char('OpenId', required=True, index=True)
-    union_id = fields.Char('UnionId')
+    open_id = fields.Char('OpenId', required=True, index=True, readonly=True)
+    union_id = fields.Char('UnionId', readonly=True)
     gender = fields.Integer('gender')
     language = fields.Char('语言')
     phone = fields.Char('手机号码')
@@ -23,13 +24,13 @@ class WxappUser(models.Model):
     city = fields.Char('城市')
     avatar = fields.Html('头像', compute='_compute_avatar')
     avatar_url = fields.Char('头像链接')
-    backend_id = fields.Many2one('res.users',string='后台用户')
     register_ip = fields.Char('注册IP')
     last_login = fields.Datetime('登陆时间')
     ip = fields.Char('登陆IP')
+    active = fields.Boolean(related='partner_id.parent_id.active',string='是否启用', inherited=True)
     status = fields.Selection(defs.WechatUserStatus.attrs.items(), string='状态', default=defs.WechatUserStatus.default)
     register_type = fields.Selection(defs.WechatUserRegisterType.attrs.items(), string='注册来源', default=defs.WechatUserRegisterType.app)
-
+    company_id = fields.Many2one('company_prd.company',string='负责人')
     partner_id = fields.Many2one('res.partner', required=True, ondelete='restrict', string='关联联系人', auto_join=True) #
     address_ids = fields.One2many('res.partner', compute='_compute_address_ids', string='收货地址')
 

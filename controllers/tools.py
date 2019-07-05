@@ -25,3 +25,11 @@ def get_decrypt_info(app_id, session_key, encrypted_data, iv):
     crypt = WXBizDataCrypt(app_id, session_key)
     _info = crypt.decrypt(encrypted_data, iv)
     return _info
+
+def get_wx_app_token(app_id, secret,grant_type):
+    api = WXAPPAPI(appid=app_id, app_secret=secret,grant_type=grant_type)
+    try:
+        get_token = api.client_credential_for_access_token()
+    except OAuth2AuthExchangeError as e:
+        raise e
+    return get_token

@@ -44,7 +44,7 @@
                     <sheet>
                     <group>
                     <field name="name"/>
-                    <field name="backend_id"/>
+
                     <field name="avatar"/>
                     <field name="phone"/>
 
@@ -56,7 +56,6 @@
 
                     <field name="open_id"/>
                     <field name="union_id"/>
-               <field name="partner_id"/>
                     <field name="create_date" string="注册时间"/>
                     <field name="last_login"/>
                     <field name="status"/>

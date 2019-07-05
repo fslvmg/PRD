@@ -9,8 +9,10 @@
                         <attribute name="invisible">True</attribute>
                     </xpath>
                     <xpath expr="//group[@name='offer']" position="after">
-                        <field name="qrcode_url" string="二维码地址"/>
+                    <group>
                         <field name="post_id" string="岗位"/>
+                        <field name="company_prd_id" string="需求公司"/>
+                    </group>
                     </xpath>
                 </field>
             </record>

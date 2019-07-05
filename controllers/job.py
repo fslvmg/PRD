@@ -35,7 +35,7 @@ class PrdJob(http.Controller, BaseController):
         try:
             res, wechat_user, entry = self._check_user(sub_domain, token)
             if res:return res
-            job_list = request.env['hr.job'].sudo().search([('create_uid','=',wechat_user.backend_id.id)])
+            job_list = request.env['hr.job'].sudo().search([])
             
 
             if not job_list:
@@ -130,33 +130,4 @@ class PrdJob(http.Controller, BaseController):
         data = {'job': job, 'survery_token':survey_token}
         return request.render('company_prd.applicant_init', data)
 
-    @http.route('/<string:sub_domain>/api/company/register',auth='public', methods=['POST'], csrf=False)
-    def company_register(self,sub_domain,token=None,**post):
-        _logger.info("##########%s############33" % post)
-        _logger.info("######################44")
-        _logger.info("######################55")
-        try:
-            Company = request.env(user=1)['res.partner']     
-            Account = request.env(user=1)['res.users']  
-            my_company = Company.create({'name':post['company_name'],'is_company':True})
-            my_contact = Company.create({'name':post['contactor'],'email':post['email'],'phone':post['phone'],'parent_id':my_company.id})
-            my_company.write({'prd_leader_id': my_contact.id,'email':my_contact.email,'phone':my_contact.phone})
-            my_account = Account.create({'login':my_contact.email,'partner_id':my_company.id,'company_id':1})
-            _data = {
-                "id": my_account.id
-            }
-            return self.res_ok(_data)
-        except Exception as e:
-            _logger.exception(e)
-            return self.res_err(-1, "ww")
-    
-    @http.route('/<string:sub_domain>/api/company/check', auth='public', methods=['POST'], csrf=False)
-    def check_company(self,sub_domain,email):
-        _logger.info("######################%s55" % email)
-        Account = request.env(user=1)['res.users'] 
-        res = Account.search([('login','=',email)])
-        
-        if res :return self.res_err(-3)
-        return self.res_ok()
-        
 
