@@ -38,5 +38,12 @@
       <field name="view_type">form</field>
       <field name="domain">[('is_active','=',True)]</field>
     </record>
+    <record id="company_apply_action" model="ir.actions.act_window">
+      <field name="name">企业列表</field>
+      <field name="res_model">company_prd.company</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_type">form</field>
+      <field name="domain">[('is_active','=',False)]</field>
+    </record>
   </data>
 </odoo>

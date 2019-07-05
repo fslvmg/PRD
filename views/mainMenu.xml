@@ -2,6 +2,7 @@
 <odoo>
     <data>
         <menuitem id="Main_Menu" name="PRD" />
+        <menuitem id="apply_menu" name="开户申请" parent="Main_Menu" action="company_apply_action" sequence="10"/>
         <menuitem id="company_menu" name="企业" parent="Main_Menu" action="company_action" sequence="10"/>
         <menuitem id="post_menu" name="职位" parent="Main_Menu" action="post_action" sequence="10"/>
         <menuitem id="job_menu" name="招聘" parent="Main_Menu" action="job_action" sequence="10"/>
