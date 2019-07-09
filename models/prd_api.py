@@ -11,6 +11,7 @@ class PrdCompany(models.Model):
 
     name = fields.Char(related='partner_id.name',string='名称', inherited=True)
     is_active = fields.Boolean(string='是否启用',default=False)
+    is_synced = fields.Boolean(string='已同步',default=False)
 
     partner_id = fields.Many2one('res.partner', required=True, ondelete='cascade', string='企业ID', auto_join=True) 
     prd_code = fields.Char('Prd-Code', default=lambda self: str(uuid.uuid4()), readonly=True, required=True, copy=False)
@@ -32,11 +33,14 @@ class PrdCompany(models.Model):
     
     def sync_to_prd(self):
         self.ensure_one()
+        self.is_active = True
         my_company = API.ApiPrd()
         sync_data = my_company.post_company(self)
         _logger.info("################%s######################" % sync_data)
         res = my_company.post_data(sync_data)
         _logger.info("################同步：%s######################" % res)
+        if res == '1':
+            self.is_synced = True
         return
 
 
@@ -145,5 +149,5 @@ class CompanyImage(models.Model):
     _description = 'company_prd.images'
 
     name = fields.Char('图片名称')
-    image = fields.Char('Url', attachment=True)
+    image = fields.Char('Url')
     company_id = fields.Many2one('company_prd.company', '企业ID', copy=True)

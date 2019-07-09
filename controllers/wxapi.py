@@ -1,4 +1,5 @@
 import logging
+import requests
 from odoo import http,exceptions,fields
 from odoo.http import request
 from .base import BaseController,error_code
@@ -8,6 +9,8 @@ import random
 from PIL import Image
 import sys,os 
 from .tools import get_wx_session_info, get_wx_user_info, get_decrypt_info,get_wx_app_token
+from datetime import datetime
+from .. import API
 
 _logger = logging.getLogger(__name__)
 
@@ -110,7 +113,6 @@ class WxProject(http.Controller, BaseController):
             if ret:return ret
 
             config = request.env['wxapp.config'].sudo()
-
             encrypted_data = encryptedData
             if not code or not encrypted_data or not iv:
                 return self.res_err(300)
@@ -132,8 +134,7 @@ class WxProject(http.Controller, BaseController):
 
             Company = request.env(user=1)['company_prd.company']
             Account = request.env(user=1)['res.users']
-
-            my_company = Company.create({'name':kwargs['company_name'],'is_company':True,'active':False,'prd_company_type':int(kwargs['prd_company_type'])})
+            my_company = Company.create({'name':kwargs['company_name'],'is_company':True,'active':False,'prd_company_type':kwargs['prd_company_type']})
             my_account = Account.create({'login':kwargs['email'],'partner_id':my_company.partner_id.id,'company_id':1})
 
             vals = {
@@ -158,7 +159,7 @@ class WxProject(http.Controller, BaseController):
             my_company.write({'prd_leader_id': my_wxappuser.partner_id.id,'email':kwargs['email'],'phone':kwargs['phone']})
             my_account.write({'partner_id':my_wxappuser.partner_id.id})
 
-            return self.res_ok()
+            return self.res_ok({"company_id":my_company.id})
 
         except AttributeError:
             return self.res_err(404)
@@ -167,9 +168,40 @@ class WxProject(http.Controller, BaseController):
             _logger.exception(e)
             return self.res_err(-1, str(e))
 
+    @http.route('/wxapi/uploadImg', auth='public',methods=['POST'], csrf=False)
+    def license_img(self,**post):
+        pc = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        web = request.httprequest.base_url.split('/wxapi')[0]+'/company_prd'
+        fd = '/static/images/license/'
+        fn = datetime.now().strftime('%Y%m%d%H%M%S') +'-'+ str(random.randint(0, 1001)) + '.png'
+        _logger.info("##############################")
+        file_url = os.path.join(fd, fn)
+
+        _logger.info(pc)
+        _logger.info(web)
+
+        avata = post['file']
+        new = Image.open(avata)
+        new.save(pc+file_url)
+
+        company = request.env(user=1)["company_prd.company"].browse([int(post['company_id'])])
+
+        if company : company.write({"license_ids":[(0,0,{"name":fn,"image":web+file_url})]})
+        _logger.info("#######成功保存文件")
+
+    def get_user_info(self, wechat_user):
+        data = {
+            'base':{
+                'mobile': wechat_user.phone,
+                'userid': '',
+            },
+        }
+        return data
+
     @http.route('/<string:sub_domain>/wxapi/job/add',auth='public', methods=['POST'], csrf=False)
     def job_add(self,sub_domain,token=None,**post):
         res, wechat_user, entry = self._check_user(sub_domain, token)
+        _logger.info(wechat_user)
         if res:return res
         config = request.env['wxapp.config'].sudo()
 
@@ -182,7 +214,7 @@ class WxProject(http.Controller, BaseController):
 
         post = json.loads(post["data"])
         try:
-            Job = request.env(user=1)['hr.job']      
+            Job = request.env(user=wechat_user.partner_id.user_id)['hr.job']      
             my_job = Job.create({'name':post['post_name'],'post_id': post['post_id'],'no_of_recruitment':post['no_of_recruitment']})
             _data = {
                 "dateAdd": my_job.create_date,
@@ -198,11 +230,11 @@ class WxProject(http.Controller, BaseController):
             return self.res_err(-1, e)
 
     @http.route('/<string:sub_domain>/wxapi/job/list', auth='public', methods=['GET'])
-    def job_list(self, sub_domain, token=None):
+    def job_list(self, sub_domain, token=None):      
         try:
             res, wechat_user, entry = self._check_user(sub_domain, token)
             if res:return res
-            job_list = request.env['hr.job'].sudo().search([('create_uid','=',wechat_user.backend_id.id)])
+            job_list = request.env['hr.job'].sudo().search([('create_uid','=',wechat_user.partner_id.user_id.id)])
             if not job_list:return self.res_err(404)
             data = [
                 {
@@ -216,31 +248,6 @@ class WxProject(http.Controller, BaseController):
         except Exception as e:
             _logger.exception(e)
             return self.res_err(-1, e)
-
-
-    @http.route('/wxapi/upload', auth='public',methods=['POST','GET'], csrf=False)
-    def license_img(self,**post):
-        _logger.info("###########%s#################gogoggo" % post)
-    
-        fn = str(random.randint(0, 100)) + '.png'
-        avata = post['file']
-        
-        model_url = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/static/images/license/'
-        _logger.info("#######打开文件%s" % model_url)
-        new = Image.open(avata)
-        pic_dir = os.path.join(model_url, fn)
-        _logger.info("#######保存文件")
-        new.save(pic_dir)
-        _logger.info("#######成功保存文件")
-
-    def get_user_info(self, wechat_user):
-        data = {
-            'base':{
-                'mobile': wechat_user.phone,
-                'userid': '',
-            },
-        }
-        return data
 
     @http.route('/<string:sub_domain>/user/detail', auth='public', methods=['GET'])
     def detail(self, sub_domain, token=None):
@@ -456,6 +463,7 @@ class WxProject(http.Controller, BaseController):
                     "name": applicant.partner_name,
                     "job":applicant.job_id.name,
                     "phone":applicant.partner_mobile,
+                    "is_pass":applicant.is_pass,
                     "has_report":applicant.response_id.token,
                     "report_url":"/survey/print/%s/%s" % (applicant.job_id.id,applicant.response_id.token)
                 } for applicant in applicant_list
@@ -465,3 +473,53 @@ class WxProject(http.Controller, BaseController):
         except Exception as e:
             _logger.exception(e)
             return self.res_err(-1, e.name)
+
+    @http.route('/<string:sub_domain>/wxapi/sycn/position/survey', auth='public', methods=['GET'])
+    def sycn_position_survey(self, sub_domain):     
+        position = request.env(user =1 )['company_prd.post']
+        position.sync_from_prd()
+
+    @http.route('/<string:sub_domain>/wxapi/sycn/applicant/<int:apply_id>', auth='public', methods=['GET'])
+    def sycn_position_survey(self, sub_domain,apply_id):     
+        applicant = request.env(user =1 )['hr.applicant'].browse([apply_id])
+        my_applicant = API.ApiPrd()
+        sync_data = my_applicant.post_applicant(applicant)
+        _logger.info("################%s######################" % sync_data)
+        res = my_applicant.post_data(sync_data)
+        _logger.info("################同步：%s######################" % res)
+        if applicant and res == '1':
+            applicant.write({"is_synced":True})
+
+    @http.route('/<string:sub_domain>/wxapi/sycn/apply/user_input/<int:apply_id>', auth='public', methods=['GET'])
+    def sycn_survey_answer(self, sub_domain,apply_id):   
+        applicant = request.env(user =1 )['hr.applicant'].browse([apply_id])
+        input_line = request.env(user =1 )['survey.user_input_line'].sudo().search([('user_input_id','=',applicant.response_id.id)])
+        my_api = API.ApiPrd()
+        input_data = my_api.get_survey_user_input(input_line)
+
+        _logger.info("################%s######################" % input_data )
+        sync_data = my_api.post_survey_by_applicant(applicant,input_data)
+
+        _logger.info("################%s######################" % sync_data)
+        path =API.PRD_URL+"/rest/submitEvaluater"
+        headers = {'Content-Type': 'application/json'}
+        r = requests.post(path,sync_data.encode('utf-8') ,headers =headers)
+        return r.text
+        _logger.info("################同步：%s######################" % r.text)
+
+    @http.route('/<string:sub_domain>/wxapi/applicant/post/ispass', auth='public', methods=['POST'], csrf=False)
+    def update_applicant_IsPass(self, sub_domain,**kwargs): 
+        applicant = request.env(user =1 )['hr.applicant'].browse(int(kwargs["applicant_id"]))
+        applicant.write({"is_pass":(kwargs['is_pass'] == str(True).lower())})
+        
+        return self.res_ok()
+
+    @http.route('/<string:sub_domain>/wxapi/applicant/ispass/init', auth='public', methods=['GET'])
+    def applicant_list_init(self, sub_domain, token=None):
+        applicant = request.env(user =1 )['hr.applicant'].search([])
+        data={}
+        for apply in applicant:
+            data[apply.id]=apply.is_pass
+        
+        return self.res_ok(data)
+            

@@ -17,9 +17,6 @@
             <field name="model">company_prd.post</field>
             <field name ="arch" type="xml">
                 <form string ="Position Form">
-                    <header>
-                        <button name="sync_from_prd" type="object" string="PRD同步" class="oe_highlight" />
-                    </header>
                     <sheet>
                         <group>
                             <field name="name" string="岗位名称"/>

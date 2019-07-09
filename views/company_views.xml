@@ -6,7 +6,7 @@
       <field name ="arch" type="xml">
         <form string ="Position Form">
           <header>
-            <button name="sync_from_prd" type="object" string="PRD同步" class="oe_highlight" />
+            <button name="sync_to_prd" type="object" string="审核" class="oe_highlight" />
           </header>
           <sheet>
             <group>
@@ -15,6 +15,7 @@
                 <field name="prd_company_type" string="企业类型"/>
                 <field name="prd_charge_type" string="计费方式"/>
                 <field name="is_active" string="是否审核"/>
+                <field name="is_synced" string="已同步"/>
               </group>
               <group>
                 <field name="prd_leader_id" string="负责人"/>

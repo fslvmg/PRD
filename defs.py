@@ -13,15 +13,15 @@ from PIL import Image
 TIMEOUT = 2
 
 class COMPANYTYPE(Const):
-    type1 =('1',u'合资')
-    type2 =('2',u'独资')
-    type3 =('3',u'国有')
-    type4 =('4',u'私营')
-    type5 =('5',u'全民所有制')
-    type6 =('6',u'集体所有制')
-    type7 =('7',u'股份制')
-    type8 =('8',u'有限责任')
-    type9 =('9',u'其他')
+    type1 =('0',u'合资')
+    type2 =('1',u'独资')
+    type3 =('2',u'国有')
+    type4 =('3',u'私营')
+    type5 =('4',u'全民所有制')
+    type6 =('5',u'集体所有制')
+    type7 =('6',u'股份制')
+    type8 =('7',u'有限责任')
+    type9 =('8',u'其他')
 
 class CHARGETYPE(Const):
     type1 =('1',u'按月计费')
@@ -134,12 +134,9 @@ def getWXACodeUnlimit(access_token,Web_url,job_id):
  
         # print(ret.text)
         model_url = os.path.dirname(os.path.realpath(__file__))
-        print('##################%s############################' % ret.content)
         with open(model_url+'/static/images/Job/code-'+str(job_id)+'.png','wb') as f:
             f.write(ret.content)
-        print('-----------------------------------------')
         #img.save(model_url+'/static/images/Job/code-'+str(job_id)+'.png')
-        print('++++++++++++++++++++++++++++++++++++++++++++')
 
 class PrdRequest(object):
 
