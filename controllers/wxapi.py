@@ -34,20 +34,22 @@ class WxProject(http.Controller, BaseController):
             _logger.exception(e)
             return self.res_err(-1, str(e))
 
-    @http.route('/<string:sub_domain>/user/wxapp/login', auth='public', methods=['GET', 'POST'],csrf=False)
-    def login(self, sub_domain, code=None, **kwargs):
+    @http.route('/<string:sub_domain>/wxapp/user/login', auth='public', methods=['GET', 'POST'],csrf=False)
+    def login(self, sub_domain, js_code =None, **kwargs):
+        _logger.info("==================%s=================================" % js_code)
+        _logger.info("==================%s=================================" % kwargs)
         try:
             ret, entry = self._check_domain(sub_domain)
             if ret:return ret
             config = request.env['wxapp.config'].sudo()
-            if not code:
+            if not js_code:
                 return self.res_err(300)
             app_id = config.get_config('app_id', sub_domain)
             secret = config.get_config('secret', sub_domain)
             if not app_id or not secret:
                 return self.res_err(404)
 
-            session_info = get_wx_session_info(app_id, secret, code)
+            session_info = get_wx_session_info(app_id, secret, js_code)
             if session_info.get('errcode'):
                 return self.res_err(-1, session_info.get('errmsg'))
 
@@ -200,6 +202,8 @@ class WxProject(http.Controller, BaseController):
 
     @http.route('/<string:sub_domain>/wxapi/job/add',auth='public', methods=['POST'], csrf=False)
     def job_add(self,sub_domain,token=None,**post):
+        _logger.info(token)
+        _logger.info(post)
         res, wechat_user, entry = self._check_user(sub_domain, token)
         _logger.info(wechat_user)
         if res:return res
@@ -215,7 +219,7 @@ class WxProject(http.Controller, BaseController):
         post = json.loads(post["data"])
         try:
             Job = request.env(user=wechat_user.partner_id.user_id)['hr.job']      
-            my_job = Job.create({'name':post['post_name'],'post_id': post['post_id'],'no_of_recruitment':post['no_of_recruitment']})
+            my_job = Job.create({'name':post['job_name'],'post_id': post['post_id'],'no_of_recruitment':1})
             _data = {
                 "dateAdd": my_job.create_date,
                 "id": my_job.id
@@ -229,12 +233,13 @@ class WxProject(http.Controller, BaseController):
             _logger.exception(e)
             return self.res_err(-1, e)
 
-    @http.route('/<string:sub_domain>/wxapi/job/list', auth='public', methods=['GET'])
-    def job_list(self, sub_domain, token=None):      
+    @http.route('/<string:sub_domain>/wxapi/job/list/<int:page>/<int:listcount>', auth='public', methods=['GET'])
+    def job_list(self, sub_domain, token=None,page=1,listcount = 5):      
         try:
+            _logger.info("###################%s######################3" % token)
             res, wechat_user, entry = self._check_user(sub_domain, token)
             if res:return res
-            job_list = request.env['hr.job'].sudo().search([('create_uid','=',wechat_user.partner_id.user_id.id)])
+            job_list = request.env['hr.job'].sudo().search([('create_uid','=',wechat_user.partner_id.user_id.id)], limit=listcount,offset=(page-1)*listcount)
             if not job_list:return self.res_err(404)
             data = [
                 {
@@ -426,8 +431,8 @@ class WxProject(http.Controller, BaseController):
             _logger.exception(e)
             return self.res_err(-1, e)
 
-    @http.route('/<string:sub_domain>/wxapi/job/info',auth='public', methods=['get'])
-    def get_job_info(self,sub_domain,**kwargs):
+    @http.route('/<string:sub_domain>/wxapi/job/info/<int:job_id>',auth='public', methods=['get'])
+    def get_job_info(self,sub_domain,job_id,**kwargs):
         ret, entry = self._check_domain(sub_domain)
         if ret:return ret
         config = request.env['wxapp.config'].sudo()
@@ -436,7 +441,7 @@ class WxProject(http.Controller, BaseController):
         if not app_id or not secret:
             return self.res_err(404)
         try:
-            job_info = request.env(user=1)['hr.job'].browse([int(kwargs['job_id'])])
+            job_info = request.env(user=1)['hr.job'].browse([int(job_id)])
             data ={
                 "job_id":job_info.id,
                 "job_name":job_info.name,
@@ -448,12 +453,13 @@ class WxProject(http.Controller, BaseController):
             _logger.exception(e)
             return self.res_err(-1, e)
 
-    @http.route('/<string:sub_domain>/wxapi/applicant/list', auth='public', methods=['GET'])
-    def applicant_list(self, sub_domain, token=None):
+    @http.route('/<string:sub_domain>/wxapi/applicant/list/<int:page>/<int:listcount>', auth='public', methods=['GET'])
+    def applicant_list(self, sub_domain, token=None,page=1,listcount = 5):
+        _logger.info("#################################################33")
         try:
             res, wechat_user, entry = self._check_user(sub_domain, token)
             if res:return res
-            applicant_list = request.env['hr.applicant'].sudo().search([])
+            applicant_list = request.env['hr.applicant'].sudo().search([], limit=listcount,offset=(page-1)*listcount)
 
             if not applicant_list:
                 return self.res_err(404)
@@ -522,4 +528,23 @@ class WxProject(http.Controller, BaseController):
             data[apply.id]=apply.is_pass
         
         return self.res_ok(data)
+
+    @http.route('/<string:sub_domain>/wxapi/post/list', auth='public', methods=['GET'])
+    def fetch_job_post(self, sub_domain,**kwargs):
+        try:
+            post_list = request.env['company_prd.post'].sudo().search([])
+
+            if not post_list:
+                return self.res_err(404)
+            data = [
+                {
+                    "id":post.id,
+                    "name": post.name,
+                } for post in post_list
+            ]
+            return self.res_ok(data)
+
+        except Exception as e:
+            _logger.exception(e)
+            return self.res_err(-1, e.name)
             

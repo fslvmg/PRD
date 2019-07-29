@@ -11,24 +11,7 @@ _logger = logging.getLogger(__name__)
 
 class PrdJob(http.Controller, BaseController):
         
-    @http.route('/api/post/list', auth='public', methods=['GET'])
-    def post_list(self, **kwargs):
-        try:
-            post_list = request.env['company_prd.post'].sudo().search([])
 
-            if not post_list:
-                return self.res_err(404)
-            data = [
-                {
-                    "id":post.id,
-                    "name": post.name,
-                } for post in post_list
-            ]
-            return self.res_ok(data)
-
-        except Exception as e:
-            _logger.exception(e)
-            return self.res_err(-1, e.name)
 
     @http.route('/<string:sub_domain>/api/job/list', auth='public', methods=['GET'])
     def job_list(self, sub_domain, token=None):

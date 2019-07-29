@@ -121,8 +121,9 @@ def getWXACodeUnlimit(access_token,Web_url,job_id):
         pass
     else:
         url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={}'.format(access_token)
-        data = {"scene":job_id,
-                "path":"pages/applicant/apply_info",
+        data = {
+            "page":"pages/applicant/apply_info",
+            "scene":job_id,
                 "width":128,
                 # "auto_color":True,
                 # "line_color":{"r":230,"g":40,"b":22},  # 自定义颜色

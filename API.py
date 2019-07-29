@@ -41,7 +41,7 @@ class ApiPrd(object):
     def post_data(self,data):
         path =PRD_URL+"/rest/companyInfo"
         headers = {'Content-Type': 'application/json'}
-        r = requests.post(path,data,headers =headers)
+        r = requests.post(path,data.encode('utf-8'),headers =headers)
         return r.text
 
     def post_applicant(self,obj_applicant):
